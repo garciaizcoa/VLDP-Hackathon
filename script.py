@@ -72,7 +72,7 @@ def prioritize_throughput():
             print("No antenna found for customer: ", customer)
     return customer_coverage
 
-    
+ #Set of selected antennas (no duplicates)
 
 ###################################################################################################
 #Step 2: Cost Minimization 
@@ -81,19 +81,77 @@ def prioritize_throughput():
     # get total throughput
     # get total number of antennas
 
-def total_cost():
-    customer_coverage = prioritize_throughput()
-    total_cost = 0;
-    for customer, antenna in customer_coverage.items():
-        total_cost += antenna_types[antenna[1]]['cost']
-    return total_cost
+def total_cost(customer_coverage, antenna_types):
+    #extract antenna types from customer coverage
+    antenna_types_selected = [antenna_type for _, antenna_type in customer_coverage]
+    #get total cost
+    cost = sum(antenna_types[antenna_type]['cost'] for antenna_type in antenna_types_selected)
+    return cost
 
 def minimize_cost():
     customer_coverage = prioritize_throughput()
-    
-####################################################################################################
 
+selected_antennas = set(prioritize_throughput().values()) #set of selected antennas (no duplicates) 
+
+####################################################################################################
+#Step 3: Output Testing
+
+#check if customer is within range of antenna
+def is_within_range(customer, antenna, antenna_type_details):
+    return distance(float(customer[2]), float(customer[3]), float(antenna[2]), float(antenna[3])) <= antenna_type_details['range']
+
+#check if all customers have coverage
+def all_customers_have_coverage(customers, antennas, customer_coverage, antenna_types):
+    for customer in customers:
+        has_coverage = False
+
+        #check all antennas
+        for antenna_code, antenna_type in customer_coverage:
+            antenna_details = next(a for a in antennas if a[0] == antenna_code) #get antenna details
+            if is_within_range(customer, antenna_details, antenna_types[antenna_type]): #check if customer is within range of antenna
+                has_coverage = True
+                break
+        if not has_coverage:
+            print(f"Customer {customer[0]} does not have coverage")
+            return False
+    return True
+
+# #PRINT TESTS W/O MINIMIZING COST
+#---------------------------------------------------------------------
+# #print total number of antennas
+# print(f"Total number of antennas: {len(prioritize_throughput())}")
+
+# # -Print total cost for an antenna for each customer
+# total_cost_value = total_cost(prioritize_throughput().values(), antenna_types)
+# print(f"Total Cost for an Antenna for each customer: ${total_cost_value}")
+
+# #Coverage Status
+# coverage_status = all_customers_have_coverage(customers, antennas, prioritize_throughput().values(), antenna_types)
+
+# if coverage_status:
+#     print("All customers have coverage")
+# else:
+#     print("Not all customers have coverage")
+#-----------------------------------------------------------------------
+# PRINT TESTS W/ MINIMIZING COST
+#
+# -Print total number of antennas
+print(f"Total number of antennas: {len(selected_antennas)}")
+
+# -Print total cost for an antenna for unique antennas only
+total_cost_value = total_cost(selected_antennas, antenna_types)
+print(f"Total Cost having unique antennas only: ${total_cost_value}")
+
+#Coverage Status
+coverage_status = all_customers_have_coverage(customers, antennas, selected_antennas, antenna_types)
+
+print("All customers have coverage: ", coverage_status) 
+
+
+########################################################################################################
+#Step 4: Output to CSV
 with open ('solution.csv', 'w', newline='') as file:
     writer = csv.writer(file)
-    for customer, (antenna, antenna_type) in prioritize_throughput().items():
-        writer.writerow([antenna, antenna_type])
+    for (antenna_code, antenna_type) in selected_antennas:
+        writer.writerow([antenna_code, antenna_type])
+    
