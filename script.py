@@ -116,6 +116,59 @@ def all_customers_have_coverage(customers, antennas, customer_coverage, antenna_
             return False
     return True
 
+##################################################################################################
+# Scipy Attempt for Minimize Cost
+
+# def obejctive(x): # Objective Function X1*100 + X2*200 + X3*300 + X4*400 + X5*500
+#     return (x[0]*1000) + (x[0]*1000) + (x[1]*2000) + (x[2]*3000) + (x[4]*5000)
+
+# # Cosntraints: The distance between the antenna type location and the customer location
+# # Must be less or equal than the antenna type's range
+# def constraint1(x):  
+#     constraints = []
+#     for customer in customers:
+#         if is_within_range(customer, selected_antennas, antenna_types['T-1']['range']):
+#             return distance(float(customer[2]), float(customer[3]), float(selected_antennas[2]), float(selected_antennas[3])) - 100
+
+# def constraint2(x):  
+#     constraints = []
+#     for customer in customers:
+#         if is_within_range(customer, selected_antennas, antenna_types['T-2']['range']):
+#             return distance(float(customer[2]), float(customer[3]), float(selected_antennas[2]), float(selected_antennas[3])) - 200
+
+# def constraint3(x):  
+#     constraints = []
+#     for customer in customers:
+#         if is_within_range(customer, selected_antennas, antenna_types['T-3']['range']):
+#             return distance(float(customer[2]), float(customer[3]), float(selected_antennas[2]), float(selected_antennas[3])) - 300
+
+# def constraint4(x):  
+#     constraints = []
+#     for customer in customers:
+#         if is_within_range(customer, selected_antennas, antenna_types['T-4']['range']):
+#             return distance(float(customer[2]), float(customer[3]), float(selected_antennas[2]), float(selected_antennas[3])) - 400
+
+# def constraint5(x):  
+#     constraints = []
+#     for customer in customers:
+#         if is_within_range(customer, selected_antennas, antenna_types['T-5']['range']):
+#             return distance(float(customer[2]), float(customer[3]), float(selected_antennas[2]), float(selected_antennas[3])) - 500
+# # Initial Guess
+# x0 = [0,0,0,0,0]
+# # Constraints
+# con1 = {'type': 'ineq', 'fun': constraint1}
+# con2 = {'type': 'ineq', 'fun': constraint2}
+# con3 = {'type': 'ineq', 'fun': constraint3}
+# con4 = {'type': 'ineq', 'fun': constraint4}
+# con5 = {'type': 'ineq', 'fun': constraint5}
+# cons = [con1, con2, con3, con4, con5]
+# #Solution'
+
+# sol = minimize(obejctive, x0, method='SLSQP', constraints=cons)
+# print("Min price is: "+sol)
+######################################################################################################
+
+
 # #PRINT TESTS W/O MINIMIZING COST
 #---------------------------------------------------------------------
 # #print total number of antennas
