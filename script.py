@@ -54,12 +54,15 @@ antenna_types = {
     # 2. Prioritize based on throughput
     # 3. Append to customer coverage dictionary
 def prioritize_throughput():
+    # used_antennas = set() #set of selected antennas (no duplicates)
     customer_coverage = {} # Dictionary for results = key: customer location, value: (antena, antenna_type)
     for customer in customers: #Iterate through each customer
         best_throughput = 0; 
         best_antenna = None; 
         best_antenna_type = None;
         for antenna in antennas: #Iterate through antennas
+            # if antenna[0] in used_antennas: #Check if antenna has been used
+                # continue
             for antena_type, details in antenna_types.items(): #Iterate through all antenna types
                 if(distance(customer[2], customer[3], antenna[2], antenna[3]) <= details['range']): #Check if antenna is within range
                     if(details['throughput'] > best_throughput):
@@ -67,13 +70,21 @@ def prioritize_throughput():
                         best_antenna = antenna[0]
                         best_antenna_type = antena_type
         if(best_antenna):
+            # used_antennas.add(best_antenna)
             customer_coverage[(customer[0])] = (best_antenna, best_antenna_type)
         else:
             print("No antenna found for customer: ", customer)
     return customer_coverage
+selected_antennas = set(prioritize_throughput().values()) #set of selected antennas (no duplicates) 
 
- #Set of selected antennas (no duplicates)
-
+def deduplicate_antennas(customer_coverage):
+    deduped_antennas = {}
+    for antenna in customer_coverage:
+        loc, type = antenna
+        if loc not in deduped_antennas or antenna_types[type]['throughput'] > antenna_types[deduped_antennas[loc]]['throughput']:
+            deduped_antennas[loc] = type
+    return deduped_antennas
+selected_antennas = deduplicate_antennas(selected_antennas).items() #set of selected antennas (no duplicates)
 ###################################################################################################
 #Step 2: Cost Minimization 
     # Algorithm:
@@ -87,11 +98,11 @@ def total_cost(customer_coverage, antenna_types):
     #get total cost
     cost = sum(antenna_types[antenna_type]['cost'] for antenna_type in antenna_types_selected)
     return cost
-
+# not done yet
 def minimize_cost():
     customer_coverage = prioritize_throughput()
 
-selected_antennas = set(prioritize_throughput().values()) #set of selected antennas (no duplicates) 
+
 
 ####################################################################################################
 #Step 3: Output Testing
@@ -136,6 +147,11 @@ def all_customers_have_coverage(customers, antennas, customer_coverage, antenna_
 # PRINT TESTS W/ MINIMIZING COST
 #
 # -Print total number of antennas
+#Step 4: Output to CSV
+with open ('solution.csv', 'w', newline='') as file:
+    writer = csv.writer(file)
+    for (antenna_code, antenna_type) in selected_antennas:
+        writer.writerow([antenna_code, antenna_type])
 print(f"Total number of antennas: {len(selected_antennas)}")
 
 # -Print total cost for an antenna for unique antennas only
@@ -148,10 +164,10 @@ coverage_status = all_customers_have_coverage(customers, antennas, selected_ante
 print("All customers have coverage: ", coverage_status) 
 
 
-########################################################################################################
-#Step 4: Output to CSV
-with open ('solution.csv', 'w', newline='') as file:
-    writer = csv.writer(file)
-    for (antenna_code, antenna_type) in selected_antennas:
-        writer.writerow([antenna_code, antenna_type])
+# ########################################################################################################
+# #Step 4: Output to CSV
+# with open ('solution.csv', 'w', newline='') as file:
+#     writer = csv.writer(file)
+#     for (antenna_code, antenna_type) in selected_antennas:
+#         writer.writerow([antenna_code, antenna_type])
     
